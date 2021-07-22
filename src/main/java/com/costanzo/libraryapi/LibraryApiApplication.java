@@ -8,7 +8,7 @@ import org.springframework.context.annotation.Bean;
 @SpringBootApplication
 public class LibraryApiApplication {
 
-	@Bean//singleton
+	@Bean
 	public ModelMapper modelMapper(){
 		return new ModelMapper();
 	}

@@ -5,26 +5,35 @@ import com.costanzo.libraryapi.exception.ApiErros;
 import com.costanzo.libraryapi.exception.BusinessException;
 import com.costanzo.libraryapi.model.entity.Book;
 import com.costanzo.libraryapi.service.BookService;
+import com.costanzo.libraryapi.service.impl.BookServiceImpl;
 import org.modelmapper.ModelMapper;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
 
 import javax.validation.Valid;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/books")
 public class BookController {
 
-
+        @Autowired
         private BookService service;
+        @Autowired
         private ModelMapper modelMapper;
 
-        public BookController(BookService service, ModelMapper mapper) {
+        /*public BookController(BookService service, ModelMapper mapper) {
                 this.service = service;
                 this.modelMapper = mapper;
-        }
+        }*/
 
         @PostMapping
         @ResponseStatus(HttpStatus.CREATED)
@@ -36,24 +45,47 @@ public class BookController {
                 return modelMapper.map(entity, BookDTO.class);
         }
 
-        //MethodArgumentNotValidException sempre que o objeto não for válido pela expressão @Valid sera lançada esta excessão
-        @ExceptionHandler(MethodArgumentNotValidException.class)
-        @ResponseStatus(HttpStatus.BAD_REQUEST)
-        public ApiErros handleValidationExceptions(MethodArgumentNotValidException ex){
-                BindingResult bindingResult = ex.getBindingResult();
-
-
-                return new ApiErros(bindingResult);
-
+        @GetMapping("{id}")
+        public BookDTO get(@PathVariable Long id) {
+               return  service
+                        .getByID(id)
+                        .map(book -> modelMapper.map(book, BookDTO.class))
+                        .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
 
         }
 
-        @ExceptionHandler(BusinessException.class)
-        @ResponseStatus(HttpStatus.BAD_REQUEST)
-        public ApiErros handleValidationExceptions(BusinessException ex){
-               return new ApiErros(ex);
+        @DeleteMapping("{id}")
+        @ResponseStatus(HttpStatus.NO_CONTENT)
+        public void delete(@PathVariable Long id){
 
+                Book book = service.getByID(id).orElseThrow(() -> new ResponseStatusException((HttpStatus.NOT_FOUND)));
+                service.delete(book);
+        }
+
+
+        @PutMapping("{id}")
+        @ResponseStatus(HttpStatus.OK)
+        public BookDTO update(@PathVariable Long id, @RequestBody @Valid BookDTO dto){
+
+               return service.getByID(id).map(book -> {
+                       book.setAuthor(dto.getAuthor());
+                       book.setTitle(dto.getTitle());
+                       book = service.update(book);
+                       return modelMapper.map(book, BookDTO.class);
+
+               }).orElseThrow(() -> new ResponseStatusException((HttpStatus.NOT_FOUND)));
 
         }
+
+        @GetMapping
+        public Page<BookDTO> find(BookDTO dto, Pageable pageRequest){
+                Book filter = modelMapper.map(dto, Book.class);
+                Page<Book> result = service.find(filter, pageRequest);
+                List<BookDTO> list = result.get().map(entity -> modelMapper.map(entity, BookDTO.class)).collect(Collectors.toList());
+                //List<BookDTO> list = result.getContent().stream().map(entity -> modelMapper.map(entity, BookDTO.class)).collect(Collectors.toList());
+                return new PageImpl<BookDTO>(list, pageRequest, result.getTotalElements());
+        }
+
+
 
 }
