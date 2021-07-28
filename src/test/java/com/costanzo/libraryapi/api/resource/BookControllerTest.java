@@ -4,6 +4,7 @@ import com.costanzo.libraryapi.api.dto.BookDTO;
 import com.costanzo.libraryapi.exception.BusinessException;
 import com.costanzo.libraryapi.model.entity.Book;
 import com.costanzo.libraryapi.service.BookService;
+import com.costanzo.libraryapi.service.LoanService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.hamcrest.Matchers;
 import org.junit.jupiter.api.DisplayName;
@@ -48,6 +49,9 @@ public class BookControllerTest {
 
     @MockBean
     BookService service;
+
+    @MockBean
+    LoanService loanService;
 
 
 
