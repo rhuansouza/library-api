@@ -58,7 +58,7 @@ public class LoanRepositoryTest {
 
     }
 
-
+/*
     @Test
     @DisplayName("Deve retornar empréstimos cuja data empréstimo for menor ou igual  a três dias atrás e não retornados")
     public void findByLoanDateLessThanAndNotReturned(){
@@ -66,7 +66,7 @@ public class LoanRepositoryTest {
         List<Loan> result = repository.findByLoanDateLessThanAndNotReturned(LocalDate.now().minusDays(4));
 
         assertThat(result).hasSize(1).contains(loan);
-    }
+    }*/
 
     @Test
     @DisplayName("Deve retornar vazio quando não houver empréstimos atrasados.")
