@@ -23,7 +23,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 @ActiveProfiles("test")
 @DataJpaTest
 public class LoanRepositoryTest {
-
+    //
     @Autowired
     private LoanRepository repository;
 
