@@ -26,7 +26,7 @@ import java.util.stream.Collectors;
 @RequestMapping("/api/loans")
 @RequiredArgsConstructor
 public class LoanController {
-    //
+
     private final LoanService service;
     private final BookService bookservice;
     private final ModelMapper modelMapper;
